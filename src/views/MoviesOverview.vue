@@ -59,6 +59,8 @@ export default {
         this.latest.page = res.data.page;
         this.latest.movies = res.data.results;
       });
+
+
     },
     fetchPopular() {
       this.$apiService.get("movie/popular").then(res => {
