@@ -1,40 +1,51 @@
 <template>
   <v-container>
-    <div>Movies overview</div>
-    <search-bar/>
+    <search-bar @onSearch="handleSearch"/>
 
-    <v-container>
-      <h3>Popular</h3>
-    </v-container>
+    <h3>Popular</h3>
+    <vue-horizontal class="horizontal">
+      <div class="item" v-for="item in popular.movies" :key="item.id">
+        <movie :movie="item" @onMovieClicked="handleMovieSelected"/>
+      </div>
+    </vue-horizontal>
 
-    <v-container>
-      <h3>Now Playing</h3>
-    </v-container>
+    <h3>Now Playing</h3>
+    <vue-horizontal class="horizontal">
+      <div class="item" v-for="item in nowPlaying.movies" :key="item.id">
+        <movie :movie="item" @onMovieClicked="handleMovieSelected"/>
+      </div>
+    </vue-horizontal>
 
-    <v-container>
-      <h3>Upcoming</h3>
-    </v-container>
+    <h3>Upcoming</h3>
+    <vue-horizontal class="horizontal">
+      <div class="item" v-for="item in upcoming.movies" :key="item.id">
+        <movie :movie="item" @onMovieClicked="handleMovieSelected"/>
+      </div>
+    </vue-horizontal>
 
-    <v-container>
-      <h3>Top Rated</h3>
-    </v-container>
+    <h3>Top Rated</h3>
+    <vue-horizontal class="horizontal">
+      <div class="item" v-for="item in topRated.movies" :key="item.id">
+        <movie :movie="item" @onMovieClicked="handleMovieSelected"/>
+      </div>
+    </vue-horizontal>
   </v-container>
 </template>
 
 <script>
 import SearchBar from "@/components/SearchBar";
+import VueHorizontal from 'vue-horizontal';
+import Movie from "@/components/Movie";
 
 export default {
   name: "MoviesOverview",
   components: {
-    SearchBar
+    Movie,
+    SearchBar,
+    VueHorizontal
   },
   data() {
     return {
-      latest: {
-        page: 0,
-        movies: []
-      },
       popular: {
         page: 0,
         movies: []
@@ -54,13 +65,11 @@ export default {
     };
   },
   methods: {
-    fetchLatest() {
-      this.$apiService.get("movie/latest").then(res => {
-        this.latest.page = res.data.page;
-        this.latest.movies = res.data.results;
-      });
-
-
+    handleSearch(search){
+      this.$router.push({ name: "MovieSearch", query: { search: search } });
+    },
+    handleMovieSelected(movie){
+      this.$router.push({ name: "MovieDetails", query: { id: movie.id } });
     },
     fetchPopular() {
       this.$apiService.get("movie/popular").then(res => {
@@ -88,7 +97,6 @@ export default {
     }
   },
   created() {
-    this.fetchLatest();
     this.fetchPopular();
     this.fetchNowPlaying();
     this.fetchUpcoming();
@@ -96,3 +104,40 @@ export default {
   }
 };
 </script>
+
+<style scoped lang="scss">
+.movieOverview {
+}
+
+.horizontal {
+  --count: 1;
+  --gap: 16px;
+  --margin: 24px;
+}
+
+@media (min-width: 640px) {
+  .horizontal {
+    --count: 2;
+  }
+}
+
+@media (min-width: 768px) {
+  .horizontal {
+    --count: 3;
+    --margin: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .horizontal {
+    --count: 4;
+  }
+}
+
+@media (min-width: 1280px) {
+  .horizontal {
+    --gap: 24px;
+    --count: 6;
+  }
+}
+</style>
